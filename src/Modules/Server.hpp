@@ -6,13 +6,6 @@
 #include "Utils.hpp"
 #include "Variable.hpp"
 
-#ifdef _WIN32
-#define AirMove_Mid_Offset 679
-#define AirMove_Signature "F3 0F 10 50 40"
-#define AirMove_Continue_Offset 5
-#define AirMove_Skip_Offset 142
-#endif
-
 class Server : public Module {
 public:
     Interface* g_GameMovement = nullptr;
@@ -69,14 +62,7 @@ public:
     // CGameMovement::AirMove
     DECL_DETOUR_B(AirMove);
 
-#ifdef _WIN32
-    // CGameMovement::AirMove
-    static uintptr_t AirMove_Skip;
-    static uintptr_t AirMove_Continue;
-    DECL_DETOUR_MID_MH(AirMove_Mid);
-#endif
-
-// CServerGameDLL::GameFrame
+    // CServerGameDLL::GameFrame
 #ifdef _WIN32
     DECL_DETOUR_STD(void, GameFrame, bool simulating);
 #else

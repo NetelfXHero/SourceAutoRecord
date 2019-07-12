@@ -42,12 +42,6 @@ REDECL(Server::AirMove);
 REDECL(Server::AirMoveBase);
 REDECL(Server::GameFrame);
 REDECL(Server::ProcessMovement);
-#ifdef _WIN32
-REDECL(Server::AirMove_Skip);
-REDECL(Server::AirMove_Continue);
-REDECL(Server::AirMove_Mid);
-REDECL(Server::AirMove_Mid_Trampoline);
-#endif
 
 MDECL(Server::GetPortals, int, iNumPortalsPlaced);
 MDECL(Server::GetAbsOrigin, Vector, S_m_vecAbsOrigin);
@@ -225,31 +219,6 @@ DETOUR_B(Server::AirMove)
 
     return Server::AirMove(thisptr);
 }
-#ifdef _WIN32
-DETOUR_MID_MH(Server::AirMove_Mid)
-{
-    __asm {
-        pushad
-        pushfd
-    }
-
-    if ((!sv_bonus_challenge.GetBool() || sv_cheats.GetBool()) && sar_aircontrol.GetBool())
-    {
-        __asm {
-            popfd
-            popad
-            jmp Server::AirMove_Skip
-        }
-    }
-
-    __asm {
-        popfd
-        popad
-        movss xmm2, dword ptr[eax + 0x40]
-        jmp Server::AirMove_Continue
-    }
-}
-#endif
 
 // CServerGameDLL::GameFrame
 #ifdef _WIN32
@@ -314,20 +283,6 @@ bool Server::Init()
             Memory::Deref<_AirMove>(baseOffset + Offsets::AirMove * sizeof(uintptr_t*), &Server::AirMoveBase);
             
             Memory::Deref<_CheckJumpButton>(baseOffset + Offsets::CheckJumpButton * sizeof(uintptr_t*), &Server::CheckJumpButtonBase);
-
-#ifdef _WIN32
-            if (!sar.game->Is(SourceGame_INFRA)) {
-                auto airMoveMid = this->g_GameMovement->Original(Offsets::AirMove) + AirMove_Mid_Offset;
-                if (Memory::FindAddress(airMoveMid, airMoveMid + 5, AirMove_Signature) == airMoveMid) {
-                    MH_HOOK_MID(this->AirMove_Mid, airMoveMid);
-                    this->AirMove_Continue = airMoveMid + AirMove_Continue_Offset;
-                    this->AirMove_Skip = airMoveMid + AirMove_Skip_Offset;
-                    console->DevMsg("SAR: Verified sar_aircontrol 1!\n");
-                } else {
-                    console->Warning("SAR: Failed to enable sar_aircontrol 1 style!\n");
-                }
-            }
-#endif
         }
     }
 
@@ -382,9 +337,6 @@ bool Server::Init()
 }
 void Server::Shutdown()
 {
-#if _WIN32
-    MH_UNHOOK(this->AirMove_Mid);
-#endif
     Interface::Delete(this->g_GameMovement);
     Interface::Delete(this->g_ServerGameDLL);
 }

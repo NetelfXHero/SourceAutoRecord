@@ -115,19 +115,6 @@ public:
     DECL_DETOUR_COMMAND(help);
     DECL_DETOUR_COMMAND(gameui_activate);
 
-#ifdef _WIN32
-    using _ReadCustomData = int(__fastcall*)(void* thisptr, int edx, void* unk1, void* unk2);
-    static _ReadCustomData ReadCustomData;
-
-    // CDemoSmootherPanel::ParseSmoothingInfo
-    static uintptr_t ParseSmoothingInfo_Skip;
-    static uintptr_t ParseSmoothingInfo_Default;
-    static uintptr_t ParseSmoothingInfo_Continue;
-    DECL_DETOUR_MID_MH(ParseSmoothingInfo_Mid);
-
-    Memory::Patch* demoSmootherPatch = nullptr;
-#endif
-
     bool Init() override;
     void Shutdown() override;
     const char* Name() override { return MODULE("engine"); }
