@@ -1,0 +1,15 @@
+name: C++ CI
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-16.04
+    
+    steps:
+    - uses: actions/checkout@v1
+    - name: Install dependencies
+      run: make get-deps
+    - name: Build
+      run: make
