@@ -66,6 +66,7 @@ post:
 #	@$(EXPORT) "$(BINARY)" "$(STEAM)Portal/$(BINARY)"
 
 get-deps:
+	sudo apt-get update
 	sudo apt-get install -y g++-multilib
 
 cvars:
