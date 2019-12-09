@@ -10,11 +10,11 @@ jobs:
     - name: Install dependencies
       run: make get-deps
     - name: Build
-      run: make
-    - name: Create artifact
       run: |
+        make
         mkdir -p artifact/
         cp sar.so artifact/sar.so
+    - name: Create artifact
       uses: actions/upload-artifact@v1
       with:
         name: sar-linux
@@ -27,10 +27,10 @@ jobs:
         run: |
           cd "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\"
           .\MSBuild.exe $Env:GITHUB_WORKSPACE\SourceAutoRecordv16.sln /t:SourceAutoRecord /p:Configuration=Release /p:Platform=x86
-      - name: Create artifact
-        run: |
+          cd $Env:GITHUB_WORKSPACE
           mkdir -p artifact/
           cp bin/sar.dll artifact/sar.dll
+      - name: Create artifact
         uses: actions/upload-artifact@v1
         with:
           name: sar-windows
