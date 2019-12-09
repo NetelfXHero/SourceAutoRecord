@@ -3,7 +3,8 @@ name: C++ CI
 on: [push]
 
 jobs:
-  build:
+  build-lin:
+    name: Linux Build
     runs-on: ubuntu-16.04
     steps:
     - uses: actions/checkout@v1
@@ -19,7 +20,8 @@ jobs:
       with:
         name: sar-linux
         path: artifact/
-  build:
+  build-win:
+    name: Windows Build
     runs-on: windows-2019
     steps:
       - uses: actions/checkout@v1
