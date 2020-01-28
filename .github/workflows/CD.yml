@@ -10,10 +10,10 @@ jobs:
     name: Release
     runs-on: ubuntu-16.04
     steps:
-    - name: Checkout
-      uses: actions/checkout@v1
+    - name: Get Release Version
+      id: get_release
+      run: echo ::set-output name=version::${GITHUB_REF:10}
     - name: Create Release
-      id: create_release
       uses: actions/create-release@master
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -21,10 +21,12 @@ jobs:
         tag_name: ${{ github.ref }}
         release_name: ${{ github.ref }}
         body: |
+          ![CD](https://github.com/NeKzor/SourceAutoRecord/workflows/CD/badge.svg)
+
           **Installation**
           - Download:
-            - [Windows]https://github.com/NeKzor/SourceAutoRecord/releases/download/${{ github.ref }}/sar.dll)
-            - [Linux](https://github.com/NeKzor/SourceAutoRecord/releases/download/${{ github.ref }}/sar.so)
+            - [Windows](https://github.com/NeKzor/SourceAutoRecord/releases/download/${{ steps.get_release.output.version }}/sar.dll)
+            - [Linux](https://github.com/NeKzor/SourceAutoRecord/releases/download/${{ steps.get_release.output.version }}/sar.so)
           - Place the binary into the game folder e.g. `Portal 2`
           - Open developer console and enter `plugin_load sar`
 
@@ -90,6 +92,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: https://uploads.github.com/repos/NeKzor/SourceAutoRecord/releases/${{ steps.latest_release.outputs.release_id }}/assets{?name,label}
-          asset_path: sar.dll
+          asset_path: bin/sar.dll
           asset_name: sar.dll
           asset_content_type: application/octet-stream
