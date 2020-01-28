@@ -14,7 +14,7 @@ jobs:
       uses: actions/checkout@v1
     - name: Create Release
       id: create_release
-      uses: actions/create-release@v1
+      uses: actions/create-release@master
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
@@ -23,10 +23,9 @@ jobs:
         body: |
           **Installation**
           - Download:
-            - [Windows]https://github.com/NeKzor/SourceAutoRecord/releases/download/${{ github.ref }}/sar-windows.zip)
-            - [Linux](https://github.com/NeKzor/SourceAutoRecord/releases/download/${{ github.ref }}/sar-linux.zip)
-          - Open the zip and extract the file
-          - Place it into the game folder e.g. `Portal 2`
+            - [Windows]https://github.com/NeKzor/SourceAutoRecord/releases/download/${{ github.ref }}/sar.dll)
+            - [Linux](https://github.com/NeKzor/SourceAutoRecord/releases/download/${{ github.ref }}/sar.so)
+          - Place the binary into the game folder e.g. `Portal 2`
           - Open developer console and enter `plugin_load sar`
 
           ---
@@ -48,29 +47,43 @@ jobs:
           [Upcoming Features](https://github.com/NeKzor/SourceAutoRecord/projects/3)
         draft: false
         prerelease: false
-    - name: Download Windows Artifact
-      uses: actions/download-artifact@v1
-      with:
-        name: sar-windows
-    - name: Download Linux Artifact
-      uses: actions/download-artifact@v1
-      with:
-        name: sar-linux
-    - name: Upload Windows Asset
+  build-lin:
+    name: Linux Build
+    runs-on: ubuntu-16.04
+    needs: release
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v1
+    - name: Install Dependencies
+      run: make get-deps
+    - name: Build
+      run: make
+    - name: Upload Asset
       uses: actions/upload-release-asset@v1.0.1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: sar-windows.zip
-        asset_name: sar-windows.zip
-        asset_content_type: application/zip
-    - name: Upload Linux Asset
-      uses: actions/upload-release-asset@v1.0.1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: sar-linux.zip
-        asset_name: sar-linux.zip
-        asset_content_type: application/zip
+        upload_url: ${{ jobs.release.steps.create_release.outputs.upload_url }}
+        asset_path: sar.so
+        asset_name: sar.so
+        asset_content_type: application/octet-stream
+  build-win:
+    name: Windows Build
+    runs-on: windows-2019
+    needs: release
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Build
+        run: |
+          cd "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\"
+          .\MSBuild.exe $Env:GITHUB_WORKSPACE\SourceAutoRecordv16.sln /t:SourceAutoRecord /p:Configuration=Release /p:Platform=x86
+      - name: Upload Windows Asset
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ jobs.release.steps.create_release.outputs.upload_url }}
+          asset_path: sar.dll
+          asset_name: sar.dll
+          asset_content_type: application/octet-stream
