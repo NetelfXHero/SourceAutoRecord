@@ -9,7 +9,7 @@ jobs:
     steps:
     - name: Fetch Latest Release
       id: latest_release
-      run: echo ::set-env name=release_id::$((node -e "require('https').request({hostname:'api.github.com',path:'/repos/NeKzor/SourceAutoRecord/releases',headers:{'User-Agent':'n^'}},(r)=>{let b='';r.on('data',(d)=>b+=d);r.on('end',()=>process.stdout.write(JSON.parse(b)[0].id.toString()));}).end();"))
+      run: echo ::set-env name=release_id::$(node -e "require('https').request({hostname:'api.github.com',path:'/repos/NeKzor/SourceAutoRecord/releases',headers:{'User-Agent':'n^'}},(r)=>{let b='';r.on('data',(d)=>b+=d);r.on('end',()=>process.stdout.write(JSON.parse(b)[0].id.toString()));}).end();")
     - name: Create Asset
       run: echo test > test.txt
     - name: Upload Asset
