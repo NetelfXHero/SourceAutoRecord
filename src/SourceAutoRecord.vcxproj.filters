@@ -318,6 +318,8 @@
     </ClCompile>
     <ClCompile Include="Features\FovChanger.cpp">
       <Filter>SourceAutoRecord\Features</Filter>
+    <ClCompile Include="Features\Hud\Crosshair.cpp">
+      <Filter>SourceAutoRecord\Features\Hud</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -665,6 +667,8 @@
     </ClInclude>
     <ClInclude Include="Features\FovChanger.hpp">
       <Filter>SourceAutoRecord\Features</Filter>
+    <ClInclude Include="Features\Hud\Crosshair.hpp">
+      <Filter>SourceAutoRecord\Features\Hud</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
